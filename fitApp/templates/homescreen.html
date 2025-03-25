@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <title>Sports Performance Analysis</title>
-    <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>Sports Performance Analysis</title>
+  <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
 </head>
 <body>
   <div class="container">
@@ -17,16 +17,45 @@
         <div class="upload-box">
           <h2>Your Image</h2>
           <input type="file" name="user_image" id="userImage" accept="image/*" required>
+          <div class="preview-wrapper">
+            <img id="previewUser" class="image-preview" alt="User Preview" style="display: none;" />
+          </div>
         </div>
 
         <div class="upload-box">
-          <h2>Pro Athlete's Image</h2>
+          <h2>Professional Athlete's Image</h2>
           <input type="file" name="athlete_image" id="athleteImage" accept="image/*" required>
+          <div class="preview-wrapper">
+            <img id="previewAthlete" class="image-preview" alt="Athlete Preview" style="display: none;" />
+          </div>
         </div>
       </div>
 
-      <button type="submit" class="analyze-button" id="submitBtn">Start Analysis</button>
+      <button type="submit" class="analyze-button">Start Analysis</button>
     </form>
   </div>
+
+  <script>
+    const userImageInput = document.getElementById('userImage');
+    const athleteImageInput = document.getElementById('athleteImage');
+    const previewUser = document.getElementById('previewUser');
+    const previewAthlete = document.getElementById('previewAthlete');
+
+    userImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        previewUser.src = URL.createObjectURL(file);
+        previewUser.style.display = 'inline-block';
+      }
+    });
+
+    athleteImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        previewAthlete.src = URL.createObjectURL(file);
+        previewAthlete.style.display = 'inline-block';
+      }
+    });
+  </script>
 </body>
 </html>
