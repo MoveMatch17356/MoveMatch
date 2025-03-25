@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Sports Performance Analysis</title>
+    <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Upload Performance Images</h1>
+    <p class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</p>
+
+    <form id="image-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'analyzing' %}">
+      {% csrf_token %}
+      <div class="upload-section">
+        <div class="upload-box">
+          <h2>Your Image</h2>
+          <input type="file" name="user_image" id="userImage" accept="image/*" required>
+        </div>
+
+        <div class="upload-box">
+          <h2>Pro Athlete's Image</h2>
+          <input type="file" name="athlete_image" id="athleteImage" accept="image/*" required>
+        </div>
+      </div>
+
+      <button type="submit" class="analyze-button" id="submitBtn">Start Analysis</button>
+    </form>
+  </div>
+</body>
+</html>
