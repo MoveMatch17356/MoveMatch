@@ -70,4 +70,5 @@ def analyzing(request):
             'athlete_image_url': default_storage.url(overlay2_path),
         })
 
+
     return render(request, 'homescreen.html')
