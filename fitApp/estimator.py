@@ -105,7 +105,6 @@ def analyze_pose(image_path1, image_path2):
 
     angle_differences = compare_joints(joints1, joints2)
 
-    # Draw keypoints on images
     overlay1 = draw_prediction_on_image(image1.numpy(), keypoints_with_scores1)
     overlay2 = draw_prediction_on_image(image2.numpy(), keypoints_with_scores2)
 
@@ -229,19 +228,30 @@ def draw_prediction_on_image(
     image, keypoints_with_scores, crop_region=None, close_figure=False,
     output_image_height=None):
     """Draws the keypoint predictions on image and returns it as a NumPy array."""
+
     height, width, channel = image.shape
     aspect_ratio = float(width) / height
+
+    # Normalize image for display
+    if image.dtype == np.uint8:
+        image_display = image / 255.0  # Scale to [0, 1] for imshow
+    else:
+        image_display = np.clip(image, 0.0, 1.0)  # Already float, clip for safety
+
     fig, ax = plt.subplots(figsize=(12 * aspect_ratio, 12))
     fig.tight_layout(pad=0)
     ax.margins(0)
-    ax.set_yticklabels([])
-    ax.set_xticklabels([])
-    plt.axis('off')
+    ax.set_yticks([])
+    ax.set_xticks([])
+    ax.axis('off')
 
-    ax.imshow(image)
-    line_segments = LineCollection([], linewidths=(4), linestyle='solid')
+    # Render base image
+    ax.imshow(image_display)
+
+    # Draw skeleton lines and keypoints
+    line_segments = LineCollection([], linewidths=4, linestyle='solid', alpha=0.9)
     ax.add_collection(line_segments)
-    scat = ax.scatter([], [], s=60, color='#FF1493', zorder=3)
+    scat = ax.scatter([], [], s=60, color='#FF1493', zorder=3, alpha=0.9)
 
     keypoint_locs, keypoint_edges, edge_colors = _keypoints_and_edges_for_display(
         keypoints_with_scores, height, width)
@@ -257,25 +267,27 @@ def draw_prediction_on_image(
         ymin = max(crop_region['y_min'] * height, 0.0)
         rec_width = min(crop_region['x_max'], 0.99) * width - xmin
         rec_height = min(crop_region['y_max'], 0.99) * height - ymin
-        rect = patches.Rectangle((xmin, ymin), rec_width, rec_height,
-                                 linewidth=1, edgecolor='b', facecolor='none')
+        rect = patches.Rectangle(
+            (xmin, ymin), rec_width, rec_height,
+            linewidth=1, edgecolor='b', facecolor='none'
+        )
         ax.add_patch(rect)
 
-    # Use the correct canvas
+    # Convert figure canvas to image array
     canvas = FigureCanvas(fig)
     canvas.draw()
-
-    # Now get the image data using canvas (not fig.canvas!)
     image_from_plot = np.frombuffer(canvas.buffer_rgba(), dtype=np.uint8)
     image_from_plot = image_from_plot.reshape(canvas.get_width_height()[::-1] + (4,))
-    image_from_plot = image_from_plot[..., :3]  # Drop alpha channel (RGBA → RGB)
+    image_from_plot = image_from_plot[..., :3]  # Remove alpha channel
 
     plt.close(fig)
 
+    # Optional resize
     if output_image_height is not None:
         output_image_width = int(output_image_height / height * width)
         image_from_plot = cv2.resize(
-            image_from_plot, dsize=(output_image_width, output_image_height),
+            image_from_plot,
+            dsize=(output_image_width, output_image_height),
             interpolation=cv2.INTER_CUBIC
         )
 
