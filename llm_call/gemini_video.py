@@ -3,7 +3,8 @@ import os
 import base64
 
 # Configure your API key
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+#genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key="AIzaSyAhsPu0-rMa5-uIsCS3Vs-7veLGJha0Sso")
 
 def encode_video_to_base64(video_path):
     """Encodes a video file to base64."""
