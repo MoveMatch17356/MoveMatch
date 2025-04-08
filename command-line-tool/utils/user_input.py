@@ -56,15 +56,14 @@ def get_crop_info(label, path):
             print("No crop selected.")
     return None
 
-def prompt_for_joints() -> List[str]:
+def prompt_for_joint() -> str:
     print("\nAvailable joints to compare:")
     for joint in JOINT_MAP:
         print(f" - {joint}")
-    selected = input("\nEnter joints to compare (space-separated): ").strip().split()
-    valid = [j for j in selected if j in JOINT_MAP]
+    selected = input("\nEnter a joint to compare: ").strip()
     
-    if not valid:
-        print("No valid joints selected. Using all available joints.")
-        return list(JOINT_MAP.keys())
-
-    return valid
+    if selected in JOINT_MAP:
+        return selected
+    else:
+        print("Invalid joint. Defaulting to 'right_elbow'")
+        return "right_elbow"
