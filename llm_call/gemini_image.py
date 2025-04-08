@@ -18,7 +18,7 @@ def analyze_sport_form_images(image1_path, image2_path):
         image1_base64 = encode_image_to_base64(image1_path)
         image2_base64 = encode_image_to_base64(image2_path)
 
-        model = genai.GenerativeModel('gemini-1.5-pro-vision')  # Or another suitable model
+        model = genai.GenerativeModel('gemini-1.5-pro-latest')  # Or another suitable model
 
         prompt = """Analyze the two images provided. The first image shows an individual performing a sport activity. The second image shows another individual performing the same sport activity with excellent form.
 
