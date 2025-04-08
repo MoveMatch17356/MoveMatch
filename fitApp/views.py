@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.files.storage import default_storage
 from .estimator import analyze_pose
-from llm_call import
+from .gemini_image import analyze_sport_form_images
 import os
 from django.conf import settings
 from PIL import Image
@@ -72,7 +72,7 @@ def analyzing(request):
             'angle_differences': angle_differences,
             'user_image_url': default_storage.url(overlay1_path),
             'athlete_image_url': default_storage.url(overlay2_path),
-            'llm_output': llm_feedback
+            'llm_feedback': llm_feedback
          })
 
 
