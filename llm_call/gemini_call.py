@@ -5,7 +5,8 @@ import numpy as np
 import os
 
 # Configure your API key
-genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+#genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
+genai.configure(api_key="AIzaSyAhsPu0-rMa5-uIsCS3Vs-7veLGJha0Sso")
 
 def generate_feedback(video1_data, video2_data):
     """

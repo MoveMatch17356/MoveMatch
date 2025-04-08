@@ -3,7 +3,8 @@ import os
 import base64
 
 # Configure your API key
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+#genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key="AIzaSyAhsPu0-rMa5-uIsCS3Vs-7veLGJha0Sso")
 
 def encode_image_to_base64(image_path):
     """Encodes an image file to base64."""

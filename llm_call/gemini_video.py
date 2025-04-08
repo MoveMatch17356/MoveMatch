@@ -10,7 +10,7 @@ def encode_video_to_base64(video_path):
     with open(video_path, "rb") as video_file:
         return base64.b64encode(video_file.read()).decode("utf-8")
 
-def analyze_sport_form(video1_path, video2_path):
+def analyze_sport_form_video(video1_path, video2_path):
     """Analyzes two sport videos and returns form improvement suggestions."""
 
     try:
