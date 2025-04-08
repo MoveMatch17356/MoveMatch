@@ -92,4 +92,7 @@ tensorflow_hub
 imageio
 opencv-python
 git+https://github.com/tensorflow/docs
-cv2
+IPython
+opencv-python
+matplotlib
+imageio

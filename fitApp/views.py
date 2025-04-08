@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.files.storage import default_storage
 from .estimator import analyze_pose
+from llm_call import
 import os
 from django.conf import settings
 from PIL import Image
@@ -38,7 +39,10 @@ def analyzing(request):
             else:
                 raise FileNotFoundError("One or both image files were not saved correctly.")
 
+            llm_feedback = analyze_sport_form_images(abs_user_path, abs_athlete_path)
+
             angle_differences, overlay1, overlay2 = analyze_pose(abs_user_path, abs_athlete_path)
+
 
             print(f"Angle differences found for {len(angle_differences)} joints:")
             for joint, angle in angle_differences.items():
@@ -68,7 +72,8 @@ def analyzing(request):
             'angle_differences': angle_differences,
             'user_image_url': default_storage.url(overlay1_path),
             'athlete_image_url': default_storage.url(overlay2_path),
-        })
+            'llm_output': llm_feedback
+         })
 
 
     return render(request, 'homescreen.html')
