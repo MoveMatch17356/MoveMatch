@@ -1,0 +1,25 @@
+<h2 style="margin-bottom: 20px;">Pose Comparison Results</h2>
+
+<div style="display: flex; gap: 40px;">
+  <div style="text-align: center;">
+    <h4>Your Pose</h4>
+    <img src="{{ user_image_url }}" width="300" alt="User Keypoints Overlay">
+  </div>
+  <div style="text-align: center;">
+    <h4>Pro Athlete Pose</h4>
+    <img src="{{ athlete_image_url }}" width="300" alt="Athlete Keypoints Overlay">
+  </div>
+</div>
+
+<h3 style="margin-top: 40px;">Angle Differences (in degrees)</h3>
+<ul>
+  {% for joint, angle in angle_differences.items %}
+    <li><strong>{{ joint }}</strong>: 
+      {% if angle %}
+        {{ angle|floatformat:2 }}°
+      {% else %}
+        <span style="color: red;">Not detected</span>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
