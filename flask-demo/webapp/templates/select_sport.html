@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select a Sport – MoveMatch</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    form {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  {% include "components/progress.html" with context %}
+
+  <h2>Select a Sport</h2>
+
+  <form method="POST">
+    {% for sport in sports %}
+      <label>
+        <input type="radio" name="sport" value="{{ sport.key }}" required>
+        {{ sport.label }}
+      </label>
+    {% endfor %}
+
+    <button type="submit">Next →</button>
+  </form>
+
+</body>
+</html>
