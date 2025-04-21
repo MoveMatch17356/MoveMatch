@@ -4,7 +4,10 @@
   {% load static %}
   <meta charset="UTF-8">
   <title>Sports Performance Analysis</title>
+  {{sport}}
+  {{technique}}
   <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
+  
 </head>
 <body>
   <div class="container">
@@ -34,13 +37,19 @@
       <button type="submit" class="analyze-button">Start Analysis</button>
     </form>
   </div>
-
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <p>Loading...</p>
+  </div>
   <script>
     const userImageInput = document.getElementById('userImage');
     const athleteImageInput = document.getElementById('athleteImage');
     const previewUser = document.getElementById('previewUser');
     const previewAthlete = document.getElementById('previewAthlete');
+    const form = document.getElementById('image-upload-form');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const container = document.getElementById('container');
 
+    // Image preview functionality
     userImageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -56,6 +65,16 @@
         previewAthlete.style.display = 'inline-block';
       }
     });
+    form.addEventListener('submit', (e) => {
+     loadingOverlay.style.display = 'flex';
+     container.style.display = 'none';
+
+     setTimeout(() => {form.submit(); }, 100);
+
+    // Prevent the default immediate form submission
+    e.preventDefault();
+  });
+  </script>
   </script>
 </body>
 </html>
