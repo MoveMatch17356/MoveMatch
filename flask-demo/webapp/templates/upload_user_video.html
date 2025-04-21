@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Your Video – MoveMatch</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      margin-top: 2rem;
+    }
+
+    input[type="file"] {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      background: #6f42c1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background: #5a32a3;
+    }
+  </style>
+</head>
+<body>
+
+  {% include "components/progress.html" with context %}
+
+  <h2>Upload Your Technique Video</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="user_video" accept="video/*" required>
+    <br>
+    <button type="submit">Next →</button>
+  </form>
+
+</body>
+</html>

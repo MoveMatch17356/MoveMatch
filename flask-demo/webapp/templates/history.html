@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Past Analyses – MoveMatch</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.05);
+      max-width: 320px;
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .meta {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+
+    a.button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🗂 Past Analyses</h2>
+
+  <div class="grid">
+    {% for job in jobs %}
+      <div class="card">
+        <video controls src="{{ job.video_file }}"></video>
+        <div class="meta">{{ job.timestamp }}</div>
+        <strong>{{ job.sport }} – {{ job.movement }}</strong><br>
+        <small>Joints: {{ job.joints | join(', ') }}</small><br>
+        <a class="button" href="/history/{{ job.job_id }}">View Results</a>
+      </div>
+    {% endfor %}
+  </div>
+
+</body>
+</html>

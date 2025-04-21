@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MoveMatch - Upload</title>
+</head>
+<body>
+  <h1>Compare Your Movement</h1>
+  <form action="/submit" method="POST" enctype="multipart/form-data">
+    <label>User Video:</label>
+    <input type="file" name="user_video" required><br><br>
+
+    <label>Comparison Video:</label>
+    <input type="file" name="comparison_video" required><br><br>
+
+    <label>Select joints to compare:</label><br>
+    {% for joint in joints %}
+      <input type="checkbox" name="joints" value="{{ joint }}"> {{ joint }}<br>
+    {% endfor %}<br>
+
+    <!-- Optional: Inputs for trim and crop as CSV strings -->
+    <label>User Trim (start,end seconds):</label>
+    <input type="text" name="trim_user"><br>
+
+    <label>User Crop (x,y,w,h):</label>
+    <input type="text" name="crop_user"><br>
+
+    <label>Comparison Trim:</label>
+    <input type="text" name="trim_comp"><br>
+
+    <label>Comparison Crop:</label>
+    <input type="text" name="crop_comp"><br><br>
+
+    <input type="submit" value="Run Analysis">
+  </form>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MoveMatch – Home</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #444;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 1rem 2rem;
+      background: #007BFF;
+      color: white;
+      font-size: 1.1rem;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s ease-in-out;
+    }
+
+    a.button:hover {
+      background: #0056b3;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏃‍♂️ MoveMatch</h1>
+  <p>Compare your athletic technique to the pros.</p>
+
+  <a class="button" href="{{ url_for('select_sport') }}">Start Analysis</a>
+
+  <footer>© {{ 2025 }} MoveMatch</footer>
+
+</body>
+</html>
