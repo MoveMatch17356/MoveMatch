@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>MoveMatch</title>
+  <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Pick Sport</h1>
+    <p class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</p>
+    <form method="POST" action="{% url 'pick_technique' %}">
+        {{ form }}
+        {% csrf_token %}
+        <button>    
+            Submit
+        </a>
+    </submit>
+    </form>
+
+
+</html>
