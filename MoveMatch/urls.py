@@ -26,9 +26,9 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('pick_sport', views.pick_sport, name ='pick_sport'),
     path('pick_technique', views.pick_technique, name ='pick_technique'),
-    path('analyze_prep', views.analyze_prep, name = 'analyze_prep'),
-    path('analyzing/', views.analyzing, name='analyzing'),
-]
+    path('display_upload_form', views.display_upload_form, name = 'display_upload_form'),
+    path('analyze_videos/', views.analyze_videos, name='analyze_videos'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

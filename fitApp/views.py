@@ -1,103 +1,103 @@
 from django.shortcuts import render
 from django.core.files.storage import default_storage
-from .estimator import analyze_pose
-from .gemini_image import analyze_sport_form_images
-import os
 from django.conf import settings
-from PIL import Image
-import io
+
+import re
+import os
 import uuid
-from .forms import SportForm, SoccerForm, TennisForm, RunningForm
+import traceback
+
+from video_analysis.types import Joint
+from video_analysis.run_analysis import run_analysis
+from video_analysis.sports import ALL_SPORTS
 
 
 def home(request):
     return render(request, 'welcome_page.html')
 
-
 def pick_sport(request):
     if request.method == 'GET':
-        context = {'form': SportForm()}
+        context = {'sports': ALL_SPORTS.values()}
         return render(request, 'pick_sport.html', context)
 
 def pick_technique(request):
     if request.method == 'POST':
-        sport = request.POST.get('sport') 
-        context = dict()
-        context["choice"] = sport
-        request.session['sport'] = sport
-        if sport == "soccer":
-            context["form"] = SoccerForm()
-        elif sport == "tennis":
-            context["form"] = TennisForm()
-        elif sport == "running":
-            context["form"] = RunningForm()
+        sport_key = request.POST.get('sport') 
+        sport = ALL_SPORTS.get(sport_key)
+        request.session['sport'] = sport.key
+        context = {
+            'sport': sport,
+            'techniques': sport.techniques
+        }
         return render(request, 'pick_technique.html', context)
 
-
-
-def analyze_prep(request):
+def display_upload_form(request):
     request.session['technique'] = request.POST.get("technique")
     if request.method == 'POST':
-        context = dict()
-        context['sport'] = request.session.get('sport')
-        context['technique'] = request.session.get('technique')
-    return render(request, 'homescreen.html', context)
+        context = {
+            'sport': request.session.get('sport'),
+            'technique': request.session.get('technique')
+        }
+        return render(request, 'upload_videos.html', context)
+    return render(request, 'upload_videos.html')
 
+def convert_markdown(text):
+    return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
 
-def analyzing(request):
+def analyze_videos(request):
     if request.method == 'POST':
-        user_image = request.FILES.get('user_image')
-        athlete_image = request.FILES.get('athlete_image')
-        if not user_image or not athlete_image:
-            print("Missing user or athlete image.")
-            return render(request, 'homescreen.html', {
-                'error': 'Please upload both images for analysis.'
+        user_video = request.FILES.get('user_video')
+        athlete_video = request.FILES.get('athlete_video')
+
+        if not user_video or not athlete_video:
+            return render(request, 'upload_videos.html', {
+                'error': 'Please upload both videos for analysis.'
             })
-        user_path = default_storage.save('tmp/user_image.jpg', user_image)
-        athlete_path = default_storage.save('tmp/athlete_image.jpg', athlete_image)
+
+        user_path = default_storage.save(f'tmp/user_{uuid.uuid4()}.mp4', user_video)
+        athlete_path = default_storage.save(f'tmp/athlete_{uuid.uuid4()}.mp4', athlete_video)
+
         abs_user_path = os.path.join(settings.MEDIA_ROOT, user_path)
         abs_athlete_path = os.path.join(settings.MEDIA_ROOT, athlete_path)
-        print(f"Absolute user image path: {abs_user_path}")
-        print(f"Absolute athlete image path: {abs_athlete_path}")
+
         try:
-            # --- Pre-analysis test cases ---
-            if os.path.exists(abs_user_path) and os.path.exists(abs_athlete_path):
-                print("Uploaded image files exist.")
-            else:
-                raise FileNotFoundError("One or both image files were not saved correctly.")
-            
-            llm_feedback = analyze_sport_form_images(abs_user_path, abs_athlete_path)
-            angle_differences, overlay1, overlay2 = analyze_pose(abs_user_path, abs_athlete_path)
-            
-            print(f"Angle differences found for {len(angle_differences)} joints:")
-            for joint, angle in angle_differences.items():
-                print(f"   - {joint}: {angle:.2f}°" if angle is not None else f"   - {joint}: Not detected")
-            # Save overlay images
-            overlay1_io = io.BytesIO()
-            overlay2_io = io.BytesIO()
-            Image.fromarray(overlay1).save(overlay1_io, format='JPEG')
-            Image.fromarray(overlay2).save(overlay2_io, format='JPEG')
+            sport_key = request.session.get('sport')
+            technique_key = request.session.get('technique')
+            sport = ALL_SPORTS.get(sport_key)
+            technique = next((t for t in sport.techniques if t.key == technique_key), None)
 
-            uid = str(uuid.uuid4())
-            overlay1_path = f'tmp/overlay_user_{uid}.jpg'
-            overlay2_path = f'tmp/overlay_athlete_{uid}.jpg'
+            if not sport or not technique:
+                raise ValueError("Missing sport or technique information in session.")
 
-            default_storage.save(overlay1_path, overlay1_io)
-            default_storage.save(overlay2_path, overlay2_io)
+            selected_joints = technique.joints
 
-            print("Overlay images saved successfully.")
+            results = run_analysis(
+                sport=sport.label,
+                technique=technique.label,
+                movement_key=technique.key,
+                user_path=abs_user_path,
+                comp_path=abs_athlete_path,
+                selected_joints=selected_joints
+            )
 
         except Exception as e:
-            print(f" Exception during analysis: {str(e)}")
-            return render(request, 'homescreen.html', {
+            print("Error during analysis:")
+            traceback.print_exc()
+            return render(request, 'upload_videos.html', {
                 'error': f"Something went wrong: {str(e)}"
             })
+
+        joint_labels = {joint: joint.replace("_", " ").title() for joint in results['angle_plots'].keys()}
+
         return render(request, 'results.html', {
-            'angle_differences': angle_differences,
-            'user_image_url': default_storage.url(overlay1_path),
-            'athlete_image_url': default_storage.url(overlay2_path),
-            'llm_feedback': llm_feedback
-         })
+            'user_image_url': default_storage.url(results['user_image']),
+            'athlete_image_url': default_storage.url(results['comp_image']),
+            'llm_feedback': convert_markdown(results['llm_feedback']),
+            'angle_plots': {k: default_storage.url(v) for k, v in results['angle_plots'].items()},
+            # 'aligned_plots': {k: default_storage.url(v) for k, v in results['aligned_plots'].items()},
+            # 'dtw_plots': {k: default_storage.url(v) for k, v in results['dtw_plots'].items()},
+            'joint_labels': joint_labels,
+        })
 
 
-    return render(request, 'homescreen.html')
+    return render(request, 'upload_videos.html')

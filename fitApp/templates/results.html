@@ -1,26 +1,43 @@
-<h2 style="margin-bottom: 20px;">Pose Comparison Results</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Technique Comparison Results</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body>
+  <div class="container">
+    <h2 class="section-title">Technique Comparison Results</h2>
 
-<div style="display: flex; gap: 40px;">
-  <div style="text-align: center;">
-    <h4>Your Pose</h4>
-    <img src="{{ user_image_url }}" width="300" alt="User Keypoints Overlay">
-  </div>
-  <div style="text-align: center;">
-    <h4>Pro Athlete Pose</h4>
-    <img src="{{ athlete_image_url }}" width="300" alt="Athlete Keypoints Overlay">
-  </div>
-</div>
+    <div class="pose-comparison">
+      <div class="pose-box">
+        <h4>Your Pose</h4>
+        <img src="{{ user_image_url }}" class="pose-image" alt="User Keypoints Overlay">
+      </div>
+      <div class="pose-box">
+        <h4>Pro Athlete Pose</h4>
+        <img src="{{ athlete_image_url }}" class="pose-image" alt="Athlete Keypoints Overlay">
+      </div>
+    </div>
 
-<h3 style="margin-top: 40px;">Angle Differences (in degrees)</h3>
-<ul>
-  {% for joint, angle in angle_differences.items %}
-    <li><strong>{{ joint }}</strong>: 
-      {% if angle %}
-        {{ angle|floatformat:2 }}°
-      {% else %}
-        <span style="color: red;">Not detected</span>
-      {% endif %}
-    </li>
-  {% endfor %}
-  {{llm_feedback}}
-</ul>
+    <h3 class="section-subtitle">Personalized Technique Feedback</h3>
+
+    {% if llm_feedback %}
+      <ul class="feedback-list">
+        {% for line in llm_feedback.splitlines %}
+          {% if line.strip %}
+            <li>{{ line|safe }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="error-message">Due to our overwhelming popularity and rapid growth, our servers are too busy at the moment to take your request. Please try again later!</p>
+    {% endif %}
+
+    <div class="center-button">
+      <a href="{% url 'home' %}" class="btn">Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

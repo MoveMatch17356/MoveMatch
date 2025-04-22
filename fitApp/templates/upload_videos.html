@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>Sports Performance Analysis</title>
+  <!-- {{sport}} -->
+  <!-- {{technique}} -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body>
+  <div class="container" id="container">
+    <h1 class="title">Upload Performance Videos</h1>
+    <p class="subtitle">Compare your form with a professional athlete's video for personalized analysis.</p>
+
+    <form id="video-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'analyze_videos' %}">
+      {% csrf_token %}
+      <div class="upload-section">
+        <div class="upload-box">
+          <h2>Your Video</h2>
+          <input type="file" name="user_video" id="userVideo" accept="video/*" required>
+          <div class="preview-wrapper">
+            <video id="previewUser" class="video-preview" width="320" height="240" controls style="display: none;"></video>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <h2>Professional Athlete's Video</h2>
+          <input type="file" name="athlete_video" id="athleteVideo" accept="video/*" required>
+          <div class="preview-wrapper">
+            <video id="previewAthlete" class="video-preview" width="320" height="240" controls style="display: none;"></video>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="analyze-button">Start Analysis</button>
+    </form>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="spinner"></div>
+    <p>Analyzing...</p>
+  </div>
+
+  <script>
+    const userVideoInput = document.getElementById('userVideo');
+    const athleteVideoInput = document.getElementById('athleteVideo');
+    const previewUser = document.getElementById('previewUser');
+    const previewAthlete = document.getElementById('previewAthlete');
+    const form = document.getElementById('video-upload-form');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const container = document.getElementById('container');
+
+    userVideoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        previewUser.src = URL.createObjectURL(file);
+        previewUser.style.display = 'block';
+      }
+    });
+
+    athleteVideoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        previewAthlete.src = URL.createObjectURL(file);
+        previewAthlete.style.display = 'block';
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      loadingOverlay.style.display = 'flex';
+      container.style.display = 'none';
+      setTimeout(() => { form.submit(); }, 100);
+      e.preventDefault(); // Delay actual form submission
+    });
+  </script>
+</body>
+</html>

@@ -4,20 +4,22 @@
   {% load static %}
   <meta charset="UTF-8">
   <title>MoveMatch</title>
-  <link rel="stylesheet" href="{% static 'css/homescreen.css' %}" type="text/css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 </head>
 <body>
   <div class="container">
     <h1 class="title">Pick Sport</h1>
     <p class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</p>
     <form method="POST" action="{% url 'pick_technique' %}">
-        {{ form }}
-        {% csrf_token %}
-        <button>    
-            Submit
-        </a>
-    </submit>
+      {% csrf_token %}
+      <select name="sport" required>
+        <option value="" disabled selected>Select a sport</option>
+        {% for sport in sports %}
+          <option value="{{ sport.key }}">{{ sport.label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Submit</button>
     </form>
-
-
+  </div>
+</body>
 </html>
