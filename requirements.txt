@@ -73,7 +73,6 @@ sqlparse==0.5.3
 stack-data==0.6.3
 tensorboard==2.19.0
 tensorboard-data-server==0.7.2
-tensorflow==2.19.0
 tensorflow-estimator==2.14.0
 tensorflow-hub==0.16.1
 tensorflow-io-gcs-filesystem==0.37.1
