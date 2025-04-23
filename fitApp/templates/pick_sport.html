@@ -6,10 +6,11 @@
   <title>MoveMatch</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 </head>
-<body>
+<body class = "sport_body">
   <div class="container">
-    <h1 class="title">Pick Sport</h1>
-    <p class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</p>
+    <h1 class="title">Pick A Sport</h1>
+    <p class="subtitle">Select a sport to center your analysis around.</p>
+    
     <form method="POST" action="{% url 'pick_technique' %}">
       {% csrf_token %}
       <select name="sport" required>
@@ -18,7 +19,8 @@
           <option value="{{ sport.key }}">{{ sport.label }}</option>
         {% endfor %}
       </select>
-      <button type="submit">Submit</button>
+      <button class="btn">Submit</button>
+    
     </form>
   </div>
 </body>

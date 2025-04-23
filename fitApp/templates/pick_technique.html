@@ -6,14 +6,13 @@
   <title>MoveMatch</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 </head>
-<body>
+<body class = "technique_body">
   <div class="container">
     <h1 class="title">Pick Technique</h1>
     <p class="subtitle">Now choose a specific technique for {{ sport.label }}.</p>
 
     <form method="POST" action="{% url 'display_upload_form' %}">
       {% csrf_token %}
-      <label for="technique">Technique:</label>
       <select id="technique" name="technique" required>
         <option value="" disabled selected>Select a technique</option>
         {% for technique in techniques %}
@@ -21,7 +20,7 @@
         {% endfor %}
       </select>
       <br><br>
-      <button type="submit">Submit</button>
+      <button class="btn">Submit</button>
     </form>
   </div>
 </body>
