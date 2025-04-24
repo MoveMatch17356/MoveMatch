@@ -1,36 +1,137 @@
 /* Base layout */
+:root{
+  --overlay-color-1: #600101;
+  --overlay-color-2: #0a0a0a;
+  --anim-duration: 2s;
+}
+
+#gradient {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; 
+  pointer-events: none; 
+  opacity: 5;
+}
+
+#gradient:after,
+#gradient:before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+}
+
+#gradient:before {
+  background: linear-gradient(135deg, var(--overlay-color-2) 0%, var(--overlay-color-1) 100%);
+  animation: OpacityAnim var(--anim-duration) ease-in-out 0s infinite alternate;
+}
+
+#gradient:after {
+  background: linear-gradient(135deg, var(--overlay-color-1) 0%, var(--overlay-color-2) 100%);
+  animation: OpacityAnim var(--anim-duration) ease-in-out calc(-1 * var(--anim-duration)) infinite alternate;
+}
+
+@keyframes OpacityAnim {
+  0%{opacity: 8.0}
+  100%{opacity: 0.0}
+}
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap');
+
+
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f8fa;
-    color: #333;
-  }
+  font-family: 'Barlow', sans-serif;
+  margin: 0;
+  padding: 40px;
+  background-color: #000;
+  color: #e0e0e0;
+  font-family: 'Montserrat';
+
+}
+
+
+.sport_body{
+  background-color: #490000;
+
+}
+
+.technique_body{
+  background-color: #231616;
+
   
-  .container {
+}
+
+.container {
     max-width: 800px;
     margin: auto;
     padding: 40px 20px;
-    background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
+
+
+  h1.fadeIn{
+
+    text-align: center;
+
+
+  }
+
+  h1.fadeIn span{
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeIn 1s ease-out forwards;
+    display:inline-block;
+  }
+  
+  h1.fadeIn span:nth-of-type(2){
+    animation-delay: 1s;
+  }
+  
+  
+  @keyframes fadeIn{
+    
+    to{
+      opacity: 1;
+      transform: translateY(0);
+    }
+  
+  }
+
+
+
   
   /* Titles */
   .title {
-    font-size: 32px;
+    font-size: 50px;
     font-weight: bold;
     text-align: center;
     margin-bottom: 10px;
+    color: #f0f0f0;
   }
   
   .subtitle {
-    font-size: 18px;
+    font-size: 25px;
     text-align: center;
-    color: #555;
+    color: #bbbbbb;
     margin-bottom: 30px;
   }
+
+  .btn {
+    padding: 12px 24px;
+    background-color: #b50000;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font: "Montserrat";
+  }
   
-  /* Forms */
+  .btn:hover {
+    background-color: #540000;
+  }
+
+ 
   form {
     display: flex;
     flex-direction: column;
@@ -49,7 +150,7 @@ body {
   button, .analyze-button {
     padding: 12px 24px;
     font-size: 16px;
-    background-color: #3498db;
+    background-color: #b50000;
     color: white;
     border: none;
     border-radius: 6px;
@@ -59,7 +160,7 @@ body {
   }
   
   button:hover, .analyze-button:hover {
-    background-color: #2c80b4;
+    background-color: #000000;
   }
   
   /* Video previews */
@@ -115,16 +216,11 @@ body {
   }
   
   li strong {
-    color: #222;
+    color: #e0e0e0;
+    ;
   }
 
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 40px;
-    color: #333;
-  }
+
   
   .container {
     max-width: 960px;
@@ -179,19 +275,7 @@ body {
     margin-top: 50px;
     text-align: center;
   }
-  
-  .btn {
-    padding: 12px 24px;
-    background-color: #3498db;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  
-  .btn:hover {
-    background-color: #2980b9;
-  }
+ 
 
   .loading-overlay {
     position: fixed;

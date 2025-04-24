@@ -7,11 +7,16 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">Welcome to MoveMatch!</h1>
-    <p class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</p>
-    
-    <a href="{% url 'pick_sport' %}" class="btn">Start</a>
+
+  <div id = "gradient"></div>
+   <div class = 'container'>
+    <h1 class = "fadeIn">
+      <span class="title">   Welcome to MoveMatch!</span>
+      <span class="subtitle">Compare your form with a professional athlete's image for personalized analysis.</span>
+    </h1>
+    <div class = "center-button">
+      <a href="{% url 'pick_sport' %}" class="btn">Start</a>
   </div>
+</div>
 </body>
 </html>
