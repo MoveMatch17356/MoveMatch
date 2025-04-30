@@ -49,6 +49,7 @@ def analyze_videos(request):
     if request.method == 'POST':
         user_video = request.FILES.get('user_video')
         athlete_video = request.FILES.get('athlete_video')
+        selected_library_video = request.POST.get('selected_library_video')
 
         if not user_video or not athlete_video:
             return render(request, 'upload_videos.html', {
@@ -56,6 +57,12 @@ def analyze_videos(request):
             })
 
         user_path = default_storage.save(f'tmp/user_{uuid.uuid4()}.mp4', user_video)
+        if athlete_video:
+            athlete_path = default_storage.save(f'temp/athlete/{athlete_video.name}', athlete_video)
+        elif selected_library_video:
+            athlete_path = selected_library_video
+        else:
+            return HttpResponseBadRequest("No athlete video provided.")
         athlete_path = default_storage.save(f'tmp/athlete_{uuid.uuid4()}.mp4', athlete_video)
 
         abs_user_path = os.path.join(settings.MEDIA_ROOT, user_path)
