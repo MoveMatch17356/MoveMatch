@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.files.storage import default_storage
 from django.conf import settings
+from django.http import HttpResponseBadRequest
 
 import re
 import os
@@ -101,3 +102,32 @@ def analyze_videos(request):
 
 
     return render(request, 'upload_videos.html')
+
+def athlete_library(request):
+    sport = request.GET.get('sport')
+    technique = request.GET.get('technique')
+    user_video_path = request.GET.get('user_video_path')  # optional if you want to pass it here
+
+    if not sport or not technique:
+        return HttpResponseBadRequest("Missing sport or technique.")
+
+    # This is where you'd get real data from a DB or storage
+    reference_dir = os.path.join(settings.MEDIA_ROOT, 'athlete_library', sport, technique)
+    if not os.path.exists(reference_dir):
+        videos = []
+    else:
+        videos = [
+            {
+                'path': os.path.join('athlete_library', sport, technique, fname),
+                'url': os.path.join(settings.MEDIA_URL, 'athlete_library', sport, technique, fname)
+            }
+            for fname in os.listdir(reference_dir)
+            if fname.endswith('.mp4')
+        ]
+
+    return render(request, 'athlete_library.html', {
+        'sport': {'key': sport, 'label': sport.capitalize()},
+        'technique': {'key': technique, 'label': technique.capitalize()},
+        'athlete_videos': videos,
+        'user_video_path': user_video_path
+    })
