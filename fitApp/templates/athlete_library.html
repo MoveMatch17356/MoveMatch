@@ -16,14 +16,12 @@
       <input type="hidden" name="user_video_path" value="{{ user_video_path }}">
       <div class="video-gallery">
         {% for video in athlete_videos %}
-          <div class="video-option">
-            <label>
-              <input type="radio" name="selected_library_video" value="{{ video.path }}" required>
-              <video width="320" height="240" controls>
-                <source src="{{ video.url }}" type="video/mp4">
-              </video>
-            </label>
-          </div>
+            =<div class="video-option">
+            <video width="320" height="240" controls>
+                <source src="{{ video.video.url }}" type="video/mp4">
+            </video>
+            <button class="btn" onclick="selectVideo('{{ video.video.url }}')">Use This Video</button>
+            </div>
         {% endfor %}
       </div>
       <div class="center-button">
@@ -31,5 +29,17 @@
       </div>
     </form>
   </div>
+
+
+    <script>
+        function selectVideo(url) {
+            if (window.opener && !window.opener.closed) {
+                window.opener.setSelectedLibraryVideo(url);
+                window.close();
+            } else {
+                alert("Main window not accessible.");
+            }
+        }
+    </script>
 </body>
 </html>
