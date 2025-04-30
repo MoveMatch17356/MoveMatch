@@ -33,14 +33,15 @@ def pick_technique(request):
         return render(request, 'pick_technique.html', context)
 
 def display_upload_form(request):
-    request.session['technique'] = request.POST.get("technique")
     if request.method == 'POST':
+        sport = request.POST.get('sport')
+        technique = request.POST.get('technique')
+
         context = {
-            'sport': request.session.get('sport'),
-            'technique': request.session.get('technique')
+            'sport': {'key': sport, 'label': sport.capitalize()},
+            'technique': {'key': technique, 'label': technique.capitalize()}
         }
         return render(request, 'upload_videos.html', context)
-    return render(request, 'upload_videos.html')
 
 def convert_markdown(text):
     return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
