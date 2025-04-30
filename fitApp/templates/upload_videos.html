@@ -28,9 +28,23 @@
 
         <div class="upload-box">
           <h2>Professional Athlete's Video</h2>
-          <input type="file" name="athlete_video" id="athleteVideo" accept="video/*" required>
-          <div class="preview-wrapper">
-            <video id="previewAthlete" class="video-preview" width="320" height="240" controls style="display: none;"></video>
+        
+          <label>
+            <input type="radio" name="reference_option" value="upload" checked onclick="toggleLibrary(false)"> Upload a reference video
+          </label>
+          <label>
+            <input type="radio" name="reference_option" value="library" onclick="toggleLibrary(true)"> Choose from our athlete library
+          </label>
+        
+          <div id="uploadSection">
+            <input type="file" name="athlete_video" id="athleteVideo" accept="video/*">
+            <div class="preview-wrapper">
+              <video id="previewAthlete" class="video-preview" width="320" height="240" controls style="display: none;"></video>
+            </div>
+          </div>
+        
+          <div id="librarySection" style="display: none;">
+            <a href="{% url 'athlete_library' %}?sport={{ sport.key }}&technique={{ technique.key }}" class="btn">Browse Athlete Library</a>
           </div>
         </div>
       </div>
@@ -45,6 +59,10 @@
   </div>
 
   <script>
+    function toggleLibrary(showLibrary) {
+      document.getElementById('uploadSection').style.display = showLibrary ? 'none' : 'block';
+      document.getElementById('librarySection').style.display = showLibrary ? 'block' : 'none';
+    }
     const userVideoInput = document.getElementById('userVideo');
     const athleteVideoInput = document.getElementById('athleteVideo');
     const previewUser = document.getElementById('previewUser');
