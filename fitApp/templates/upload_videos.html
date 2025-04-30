@@ -44,7 +44,18 @@
           </div>
         
           <div id="librarySection" style="display: none;">
-            <a href="{% url 'athlete_library' %}?sport={{ sport.key }}&technique={{ technique.key }}" class="btn">Browse Athlete Library</a>
+            <input type="file" name="user_video" accept="video/*" required>
+
+            <!-- Hidden field to hold selected library video path -->
+            <input type="hidden" name="selected_library_video" id="selectedLibraryVideo">
+
+            <!-- Video preview -->
+            <div class="preview-wrapper">
+              <video id="previewAthleteLibrary" class="video-preview" width="320" height="240" controls style="display: none;"></video>
+            </div>
+
+            <!-- Button to open popup window -->
+            <button type="button" class="btn" onclick="openLibraryPopup()">Choose from Athlete Library</button>
           </div>
         </div>
       </div>
@@ -93,6 +104,23 @@
       setTimeout(() => { form.submit(); }, 100);
       e.preventDefault(); // Delay actual form submission
     });
+
+    function openLibraryPopup() {
+      const sport = "{{ sport.key }}";
+      const technique = "{{ technique.key }}";
+      const url = "{% url 'athlete_library' %}?sport=" + sport + "&technique=" + technique;
+
+      window.open(url, "AthleteLibrary", "width=900,height=600");
+    }
+
+    function setSelectedLibraryVideo(url) {
+      const hiddenField = document.getElementById('selectedLibraryVideo');
+      const preview = document.getElementById('previewAthleteLibrary');
+
+      hiddenField.value = url;
+      preview.src = url;
+      preview.style.display = 'block';
+    }
   </script>
 </body>
 </html>
