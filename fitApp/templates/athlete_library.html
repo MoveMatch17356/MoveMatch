@@ -16,11 +16,11 @@
       <input type="hidden" name="user_video_path" value="{{ user_video_path }}">
       <div class="video-gallery">
         {% for video in athlete_videos %}
-            =<div class="video-option">
-            <video width="320" height="240" controls>
-                <source src="{{ video.video.url }}" type="video/mp4">
-            </video>
-            <button class="btn" onclick="selectVideo('{{ video.video.url }}')">Use This Video</button>
+            <div class="video-option">
+                <video width="320" height="240" controls>
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                </video>
+                <button class="btn" onclick="selectVideo('{{ video.video.url }}')">Use This Video</button>
             </div>
         {% endfor %}
       </div>

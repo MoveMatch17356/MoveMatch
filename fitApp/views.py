@@ -11,7 +11,7 @@ import traceback
 from video_analysis.types import Joint
 from video_analysis.run_analysis import run_analysis
 from video_analysis.sports import ALL_SPORTS
-
+from .models import ReferenceVideo
 
 def home(request):
     return render(request, 'welcome_page.html')
@@ -23,9 +23,14 @@ def pick_sport(request):
 
 def pick_technique(request):
     if request.method == 'POST':
-        sport_key = request.POST.get('sport') 
+        sport_key = request.POST.get('sport')
         sport = ALL_SPORTS.get(sport_key)
-        request.session['sport'] = sport.key
+
+        if not sport:
+            return HttpResponseBadRequest("Invalid or missing sport.")
+
+        request.session['sport'] = sport.key  # store for use later
+
         context = {
             'sport': sport,
             'techniques': sport.techniques
@@ -34,12 +39,20 @@ def pick_technique(request):
 
 def display_upload_form(request):
     if request.method == 'POST':
-        sport = request.POST.get('sport')
-        technique = request.POST.get('technique')
+        technique_key = request.POST.get('technique')
+        sport_key = request.session.get('sport')
+        sport = ALL_SPORTS.get(sport_key)
+        technique = None
+
+        if sport:
+            technique = next((t for t in sport.techniques if t.key == technique_key), None)
+
+        if not sport or not technique:
+            return HttpResponseBadRequest("Missing or invalid sport or technique.")
 
         context = {
-            'sport': {'key': sport, 'label': sport.capitalize()},
-            'technique': {'key': technique, 'label': technique.capitalize()}
+            'sport': sport,
+            'technique': technique,
         }
         return render(request, 'upload_videos.html', context)
 
@@ -114,24 +127,13 @@ def analyze_videos(request):
 def athlete_library(request):
     sport = request.GET.get('sport')
     technique = request.GET.get('technique')
-    user_video_path = request.GET.get('user_video_path')  # optional if you want to pass it here
+    user_video_path = request.GET.get('user_video_path')
 
     if not sport or not technique:
         return HttpResponseBadRequest("Missing sport or technique.")
 
-    # This is where you'd get real data from a DB or storage
-    reference_dir = os.path.join(settings.MEDIA_ROOT, 'athlete_library', sport, technique)
-    if not os.path.exists(reference_dir):
-        videos = []
-    else:
-        videos = [
-            {
-                'path': os.path.join('athlete_library', sport, technique, fname),
-                'url': os.path.join(settings.MEDIA_URL, 'athlete_library', sport, technique, fname)
-            }
-            for fname in os.listdir(reference_dir)
-            if fname.endswith('.mp4')
-        ]
+    # Pull from DB model instead of scanning folders
+    videos = ReferenceVideo.objects.filter(sport=sport, technique=technique)
 
     return render(request, 'athlete_library.html', {
         'sport': {'key': sport, 'label': sport.capitalize()},
