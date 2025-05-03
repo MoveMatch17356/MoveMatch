@@ -4,12 +4,10 @@
   {% load static %}
   <meta charset="UTF-8">
   <title>Sports Performance Analysis</title>
-  <!-- {{sport}} -->
-  <!-- {{technique}} -->
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 </head>
 <body>
-  <div id = "gradient"></div>
+  <div id="gradient"></div>
 
   <div class="container" id="container">
     <h1 class="title">Upload Performance Videos</h1>
@@ -35,13 +33,15 @@
         </div>
       </div>
 
-      <button class="btn" class="analyze-button">Start Analysis</button>
+      <button class="btn" type="submit">Start Analysis</button>
     </form>
   </div>
 
   <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-    <div class="spinner"></div>
-    <p>Analyzing...</p>
+    <p id="loadingText">Analyzing...</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
   </div>
 
   <script>
@@ -52,7 +52,7 @@
     const form = document.getElementById('video-upload-form');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const container = document.getElementById('container');
-
+  
     userVideoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -60,7 +60,7 @@
         previewUser.style.display = 'block';
       }
     });
-
+  
     athleteVideoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -68,13 +68,64 @@
         previewAthlete.style.display = 'block';
       }
     });
-
+  
     form.addEventListener('submit', (e) => {
+      e.preventDefault();
       loadingOverlay.style.display = 'flex';
       container.style.display = 'none';
-      setTimeout(() => { form.submit(); }, 100);
-      e.preventDefault(); // Delay actual form submission
+  
+      const progressBar = document.getElementById('progressBar');
+      const loadingText = document.getElementById('loadingText');
+  
+      const phrases = [
+        "Initializing biomechanics engine...",
+        "Extracting joint vectors...",
+        "Calculating angular momentum...",
+        "Normalizing skeletal alignment...",
+        "Comparing movement arcs...",
+        "Syncing pose frames...",
+        "Evaluating limb dynamics...",
+        "Measuring torque discrepancies...",
+        "Scoring performance accuracy...",
+        "Generating personalized insights..."
+      ];
+  
+      let phraseIndex = 0;
+      function updateText() {
+        loadingText.textContent = phrases[phraseIndex % phrases.length];
+        phraseIndex++;
+      }
+  
+      updateText();
+      const textInterval = setInterval(updateText, 3000);
+  
+      let progress = 0;
+      let startTime = performance.now();
+      const maxProgress = 95; // Never go beyond 95%
+
+      function easeOutProgress(t) {
+        return Math.pow(t, 0.75);
+      }
+
+
+      function animate() {
+        const elapsed = performance.now() - startTime;
+        const t = Math.min(elapsed / 30000, 1); // use full 30s for smoother curve
+        const eased = easeOutProgress(t);
+        progress = Math.min(eased * maxProgress, maxProgress);
+        progressBar.style.width = `${progress.toFixed(2)}%`;
+        requestAnimationFrame(animate); // Keep animating
+      }
+
+      animate();
+  
+      // Submit the form after 30 seconds (or replace with AJAX/polling)
+      setTimeout(() => {
+        clearInterval(textInterval);
+        form.submit();
+      }, 30000);
     });
   </script>
+  
 </body>
 </html>

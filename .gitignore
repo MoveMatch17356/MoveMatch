@@ -3,3 +3,5 @@ venv310/
 venv-tf/
 *.pyc
 __pycache__/
+media/results/
+media/tmp/

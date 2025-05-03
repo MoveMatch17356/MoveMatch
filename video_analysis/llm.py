@@ -10,19 +10,28 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
+def encode_video_to_base64(video_path):
+    """Encodes a video file to base64."""
+    with open(video_path, "rb") as video_file:
+        return base64.b64encode(video_file.read()).decode("utf-8")
+
 def generate_athlete_feedback(
     sport: str,
     technique: str,
     joints: List[str],
-    plot_paths: Dict[str, Dict[str, str]]
+    plot_paths: Dict[str, Dict[str, str]],
+    user_video_path: str,
+    comp_video_path: str
 ) -> str:
     try:
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
 
         prompt = (
-            f"You are a data-driven athletics coach helping your {sport} athlete to change their {technique}.\n\n"
-            "You are given a video of your athlete's current technique, and a comparison video that your athlete "
-            "wants to change their technique to look more like.\n\n"
+            f"You are a data-driven {sport} coach helping your {sport} athlete to change their {technique}.\n\n"
+            f"You are given a video of your athlete's current technique:"
+            f"[Video path] \n\n"
+            f"You are also given a comparison video of a {sport} pro that your athlete wants to change their {technique} to look more like:"
+            f"[Video path] \n\n"
             "You are also given some informative graphs relating to the angles of joints of your athlete and the comparison "
             f"athlete during their {technique}s over time.\n\n"
             # "The DTW plot represents the dynamic-time warping mapping of the athlete's technique to the comparison athlete's technique. "
@@ -46,6 +55,11 @@ def generate_athlete_feedback(
         print(prompt)
 
         # Collect image data for Gemini
+        videos = [ 
+            {"mime_type": "video/mp4", "data":  encode_video_to_base64(user_video_path)},
+            {"mime_type": "video/mp4", "data":  encode_video_to_base64(comp_video_path)}
+        ]
+
         images = []
         for joint in joints:
             # for kind in ["raw_plot", "dtw_path_plot", "aligned_plot"]:
@@ -58,7 +72,7 @@ def generate_athlete_feedback(
                 })
 
         print("Generating content...")
-        response = model.generate_content([prompt] + images, stream=False)
+        response = model.generate_content([prompt] + videos + images, stream=False)
         print("Generated content!\n")
 
         print("Response:")

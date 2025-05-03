@@ -68,16 +68,13 @@ def run_analysis(sport, technique, movement_key, user_path, comp_path, selected_
         for joint in selected_joints
     }
 
-    plot_paths["middle_frames"] = {
-        "user_video_sample": user_image,
-        "comparison_video_sample": comp_image
-    }
-
     feedback = generate_athlete_feedback(
         sport=sport,
         technique=technique,
         joints=selected_joints,
-        plot_paths=plot_paths
+        plot_paths=plot_paths,
+        user_video_path = user_path,
+        comp_video_path = comp_path
     )
 
     return {
