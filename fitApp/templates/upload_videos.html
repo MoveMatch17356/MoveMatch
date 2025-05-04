@@ -17,7 +17,11 @@
 
     <form id="video-upload-form" method="POST" enctype="multipart/form-data" action="{% url 'analyze_videos' %}">
       {% csrf_token %}
+      <input type="hidden" name="reference_option" id="referenceOption" value="upload">
+      <input type="hidden" name="selected_library_video" id="selectedLibraryVideo">
+    
       <div class="upload-section">
+        <!-- User video input -->
         <div class="upload-box">
           <h2>Your Video</h2>
           <input type="file" name="user_video" id="userVideo" accept="video/*" required>
@@ -25,43 +29,24 @@
             <video id="previewUser" class="video-preview" width="320" height="240" controls style="display: none;"></video>
           </div>
         </div>
-
+    
+        <!-- Professional athlete video -->
         <div class="upload-box">
           <h2>Professional Athlete's Video</h2>
-        
-          <label>
-            <input type="radio" name="reference_option" value="upload" checked onclick="toggleLibrary(false)"> Upload a reference video
-          </label>
-          <label>
-            <input type="radio" name="reference_option" value="library" onclick="toggleLibrary(true)"> Choose from our athlete library
-          </label>
-        
-          <div id="uploadSection">
-            <input type="file" name="athlete_video" id="athleteVideo" accept="video/*">
-            <div class="preview-wrapper">
-              <video id="previewAthlete" class="video-preview" width="320" height="240" controls style="display: none;"></video>
-            </div>
-          </div>
-        
-          <div id="librarySection" style="display: none;">
-            <input type="file" name="user_video" accept="video/*" required>
-
-            <!-- Hidden field to hold selected library video path -->
-            <input type="hidden" name="selected_library_video" id="selectedLibraryVideo">
-
-            <!-- Video preview -->
-            <div class="preview-wrapper">
-              <video id="previewAthleteLibrary" class="video-preview" width="320" height="240" controls style="display: none;"></video>
-            </div>
-
-            <!-- Button to open popup window -->
-            <button type="button" class="btn" onclick="openLibraryPopup()">Choose from Athlete Library</button>
+          <input type="file" name="athlete_video" id="athleteVideo" accept="video/*">
+          <p style="text-align: center; margin: 0.5rem 0;">or</p>
+          <button type="button" class="btn" onclick="openLibraryPopup()">Choose from Athlete Library</button>
+    
+          <!-- Single preview for both upload or library -->
+          <div class="preview-wrapper" style="margin-top: 1rem;">
+            <video id="previewAthleteUnified" class="video-preview" width="320" height="240" controls style="display: none;"></video>
           </div>
         </div>
       </div>
-
-      <button class="btn" class="analyze-button">Start Analysis</button>
+    
+      <button class="btn analyze-button">Start Analysis</button>
     </form>
+    
   </div>
 
   <div class="loading-overlay" id="loadingOverlay" style="display: none;">
@@ -70,18 +55,31 @@
   </div>
 
   <script>
+    const userVideoInput = document.getElementById('userVideo');
+    const athleteVideoInput = document.getElementById('athleteVideo');
+    const previewUser = document.getElementById('previewUser');
+    const form = document.getElementById('video-upload-form');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const container = document.getElementById('container');
     function toggleLibrary(showLibrary) {
       document.getElementById('uploadSection').style.display = showLibrary ? 'none' : 'block';
       document.getElementById('librarySection').style.display = showLibrary ? 'block' : 'none';
     }
-    const userVideoInput = document.getElementById('userVideo');
-    const athleteVideoInput = document.getElementById('athleteVideo');
-    const previewUser = document.getElementById('previewUser');
-    const previewAthlete = document.getElementById('previewAthlete');
-    const form = document.getElementById('video-upload-form');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const container = document.getElementById('container');
+    document.getElementById('athleteVideo').addEventListener('change', () => {
+      document.getElementById('referenceOption').value = 'upload';
+    });
 
+    function setSelectedLibraryVideo(url) {
+      const hiddenField = document.getElementById('selectedLibraryVideo');
+      const preview = document.getElementById('previewAthleteUnified');
+      const refOption = document.getElementById('referenceOption');
+
+      hiddenField.value = url;
+      refOption.value = 'library';
+
+      preview.src = url;
+      preview.style.display = 'block';
+    }
     userVideoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -93,8 +91,10 @@
     athleteVideoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        previewAthlete.src = URL.createObjectURL(file);
-        previewAthlete.style.display = 'block';
+        const preview = document.getElementById('previewAthleteUnified');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        document.getElementById('referenceOption').value = 'upload';
       }
     });
 
@@ -111,15 +111,6 @@
       const url = "{% url 'athlete_library' %}?sport=" + sport + "&technique=" + technique;
 
       window.open(url, "AthleteLibrary", "width=900,height=600");
-    }
-
-    function setSelectedLibraryVideo(url) {
-      const hiddenField = document.getElementById('selectedLibraryVideo');
-      const preview = document.getElementById('previewAthleteLibrary');
-
-      hiddenField.value = url;
-      preview.src = url;
-      preview.style.display = 'block';
     }
   </script>
 </body>

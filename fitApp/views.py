@@ -49,6 +49,8 @@ def display_upload_form(request):
 
         if not sport or not technique:
             return HttpResponseBadRequest("Missing or invalid sport or technique.")
+        
+        request.session['technique'] = technique_key
 
         context = {
             'sport': sport,
@@ -64,24 +66,42 @@ def analyze_videos(request):
         user_video = request.FILES.get('user_video')
         athlete_video = request.FILES.get('athlete_video')
         selected_library_video = request.POST.get('selected_library_video')
+        reference_option = request.POST.get('reference_option')
 
-        if not user_video or not athlete_video:
+        # --- 1. Validate user upload ---
+        if not user_video:
             return render(request, 'upload_videos.html', {
-                'error': 'Please upload both videos for analysis.'
+                'error': 'Please upload your own video.'
             })
 
         user_path = default_storage.save(f'tmp/user_{uuid.uuid4()}.mp4', user_video)
-        if athlete_video:
-            athlete_path = default_storage.save(f'temp/athlete/{athlete_video.name}', athlete_video)
-        elif selected_library_video:
-            athlete_path = selected_library_video
+
+        if selected_library_video:
+            # Convert URL path to absolute file path
+            relative_path = selected_library_video.replace(settings.MEDIA_URL, "")
+            athlete_path = os.path.join(settings.MEDIA_ROOT, relative_path)
+        # --- 2. Handle reference video logic based on selection ---
+        if reference_option == "upload":
+            if not athlete_video:
+                return HttpResponseBadRequest("You selected to upload a reference video but did not provide one.")
+            athlete_path = default_storage.save(f'tmp/athlete_{uuid.uuid4()}.mp4', athlete_video)
+
+        elif reference_option == "library":
+            print(selected_library_video)
+            if not selected_library_video or not selected_library_video.strip():
+                return HttpResponseBadRequest("You selected a library video but did not choose one.")
+            athlete_path = selected_library_video.strip()  # already URL
+
         else:
-            return HttpResponseBadRequest("No athlete video provided.")
-        athlete_path = default_storage.save(f'tmp/athlete_{uuid.uuid4()}.mp4', athlete_video)
+            return HttpResponseBadRequest("Invalid reference video option.")
 
+        # --- 3. Build absolute paths ---
         abs_user_path = os.path.join(settings.MEDIA_ROOT, user_path)
-        abs_athlete_path = os.path.join(settings.MEDIA_ROOT, athlete_path)
+        abs_athlete_path = athlete_path
+        if not athlete_path.startswith("/media"):
+            abs_athlete_path = os.path.join(settings.MEDIA_ROOT, athlete_path)
 
+        # --- 4. Run analysis ---
         try:
             sport_key = request.session.get('sport')
             technique_key = request.session.get('technique')
@@ -91,38 +111,31 @@ def analyze_videos(request):
             if not sport or not technique:
                 raise ValueError("Missing sport or technique information in session.")
 
-            selected_joints = technique.joints
-
             results = run_analysis(
                 sport=sport.label,
                 technique=technique.label,
                 movement_key=technique.key,
                 user_path=abs_user_path,
                 comp_path=abs_athlete_path,
-                selected_joints=selected_joints
+                selected_joints=technique.joints
             )
 
         except Exception as e:
-            print("Error during analysis:")
             traceback.print_exc()
             return render(request, 'upload_videos.html', {
                 'error': f"Something went wrong: {str(e)}"
             })
 
+        # --- 5. Render results ---
         joint_labels = {joint: joint.replace("_", " ").title() for joint in results['angle_plots'].keys()}
-
         return render(request, 'results.html', {
             'user_image_url': default_storage.url(results['user_image']),
             'athlete_image_url': default_storage.url(results['comp_image']),
             'llm_feedback': convert_markdown(results['llm_feedback']),
             'angle_plots': {k: default_storage.url(v) for k, v in results['angle_plots'].items()},
-            # 'aligned_plots': {k: default_storage.url(v) for k, v in results['aligned_plots'].items()},
-            # 'dtw_plots': {k: default_storage.url(v) for k, v in results['dtw_plots'].items()},
             'joint_labels': joint_labels,
         })
 
-
-    return render(request, 'upload_videos.html')
 
 def athlete_library(request):
     sport = request.GET.get('sport')
