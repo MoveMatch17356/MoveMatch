@@ -48,11 +48,14 @@ def generate_athlete_feedback(
             "Please give some simple, actionable advice to your athlete on how to change their technique to look more like that of the comparison athlete. "
             "Do not mention technical terms or anything under the hood. You are communicating to an athlete, not a statistician. "
             "Make sure your response is given as a list of actionable bullet points.\n\n"
-            "Good luck!"
+            "Good luck!\n\n"
+            "(Make sure to give only the text I asked for back. I will display exactly what you return, so don't acknowledge me or the prompt, just answer the prompt.)\n"
+            "(Also, if the name of the sport or technique I gave you in does not match either of the videos, tell the user that they did not upload the correct footage.)"
         )
 
         print("Prompt: \n\n")
         print(prompt)
+        print("\n")
 
         # Collect image data for Gemini
         videos = [ 
@@ -76,9 +79,11 @@ def generate_athlete_feedback(
         print("Generated content!\n")
 
         print("Response:")
-        print(response.text)
+        cleaned_lines = [line.lstrip("- ").strip() for line in response.text.splitlines() if line.strip()]
+        cleaned_text = "\n".join(cleaned_lines)
+        print(cleaned_text)
 
-        return response.text
+        return cleaned_text
 
     except Exception as e:
         return f"An error occurred while generating feedback: {e}"

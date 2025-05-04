@@ -107,7 +107,6 @@
         return Math.pow(t, 0.75);
       }
 
-
       function animate() {
         const elapsed = performance.now() - startTime;
         const t = Math.min(elapsed / 30000, 1); // use full 30s for smoother curve
@@ -120,10 +119,13 @@
       animate();
   
       // Submit the form after 30 seconds (or replace with AJAX/polling)
-      setTimeout(() => {
-        clearInterval(textInterval);
-        form.submit();
-      }, 30000);
+      // setTimeout(() => {
+      //   // clearInterval(textInterval);
+      //   form.submit();
+      // }, 30000);
+
+      form.submit();
+
     });
   </script>
   
