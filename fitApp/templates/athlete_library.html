@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>Athlete Library</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1>Select a Reference Video</h1>
+    <p>Choose a professional video for {{ sport.label }} - {{ technique.label }}</p>
+
+    <div class="video-gallery">
+      {% for video in athlete_videos %}
+        <div class="video-option">
+          <video width="320" height="240" controls>
+            <source src="{{ video.video.url }}" type="video/mp4">
+          </video>
+          <!-- Don't submit the popup form — just run JS -->
+          <button class="btn" type="button" onclick="selectVideo('{{ video.video.url }}')">Use This Video</button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    function selectVideo(url) {
+      console.log("Library: selected video URL:", url);
+      if (window.opener && !window.opener.closed) {
+        window.opener.setSelectedLibraryVideo(url);
+        window.close();
+      } else {
+        alert("Main window not accessible.");
+      }
+    }
+  </script>
+</body>
+</html>
