@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>MoveMatch</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body class = "sport_body">
+  <body>
+    <div id = "bar">
+      <a id = "id_nav_logout"href="{% url 'logout' %}"> Logout </a>
+      <a id = "id_nav_logout"href="{% url 'home' %}"> Home </a>
+      <a id = "id_nav_logout"href="{% url 'profile' %}"> Profile </a> 
+    </div>
+
+  <div class="container">
+    <h1 class="title">Pick A Sport</h1>
+    <p class="subtitle">Select a sport to center your analysis around.</p>
+    
+    <form method="POST" action="{% url 'pick_technique' %}">
+      {% csrf_token %}
+      <select name="sport" required>
+        <option value="" disabled selected>Select a sport</option>
+        {% for sport in sports %}
+          <option value="{{ sport.key }}">{{ sport.label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn">Submit</button>
+    
+    </form>
+  </div>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>MoveMatch</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body>
+    <div id = "gradient"></div>
+    
+    
+    <div id="bar">
+        <h2 class="page-title">Login</h2>
+        <div class="nav-button-container">
+          <a class="nav-button" href="{% url 'register' %}">Register</a>
+        </div>
+      </div>
+    
+
+   
+
+    <form method="post" action="{% url 'login' %}">
+        <table>
+            {{form.as_table}}
+        </table>
+        {% csrf_token %}
+        <button id = "id_login_button"type="submit">Submit</button>
+    </form>
+
+</body>
+</html>
+
