@@ -8,6 +8,7 @@ class Technique:
     key: str
     label: str
     joints: List[Joint]
+    # videos: List[str]
 
 @dataclass
 class Sport:
@@ -21,7 +22,7 @@ TENNIS = Sport(
     label="Tennis",
     techniques=[
         Technique("serve", "Serve", [Joint.RIGHT_SHOULDER, Joint.RIGHT_ELBOW, Joint.RIGHT_SHOULDER]),
-        Technique("forehand", "Forehand", [Joint.RIGHT_KNEE, Joint.LEFT_KNEE, Joint.RIGHT_ELBOW, Joint.RIGHT_WRIST]),
+        Technique("forehand", "Forehand", [Joint.RIGHT_KNEE, Joint.LEFT_KNEE, Joint.RIGHT_ELBOW]),
     ],
 )
 

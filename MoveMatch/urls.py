@@ -33,6 +33,7 @@ urlpatterns = [
     path('pick_technique/', views.pick_technique, name ='pick_technique'),
     path('display_upload_form/', views.display_upload_form, name = 'display_upload_form'),
     path('analyze_videos/', views.analyze_videos, name='analyze_videos'),
+    path('athlete-library/', views.athlete_library, name='athlete_library'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

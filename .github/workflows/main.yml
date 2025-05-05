@@ -1,0 +1,10 @@
+name: Set Gemini API Key
+
+on: [push] # Or any other event you want to trigger this workflow
+
+jobs:
+  set_api_key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set API Key as Environment Variable
+        run: echo "GOOGLE_API_KEY=${{ secrets.SID_GEMINI_API_KEY }}" >> $GITHUB_ENV

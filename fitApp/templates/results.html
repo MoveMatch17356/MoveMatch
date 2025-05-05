@@ -5,24 +5,80 @@
   <meta charset="UTF-8">
   <title>Technique Comparison Results</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+  <style>
+    .video-section {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .video-box {
+      width: 45%;
+      min-width: 280px;
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      border: 2px solid #b50000;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.2);
+    }
+
+    .slider-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 20px 0;
+      scroll-snap-type: x mandatory;
+    }
+
+    .slider-item {
+      flex: 0 0 auto;
+      width: 300px;
+      scroll-snap-align: start;
+      text-align: center;
+    }
+
+    .slider-item img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .slider-label {
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .section-subtitle {
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h2 class="section-title">Technique Comparison Results</h2>
 
-    <div class="pose-comparison">
-      <div class="pose-box">
-        <h4>Your Pose</h4>
-        <img src="{{ user_image_url }}" class="pose-image" alt="User Keypoints Overlay">
+    <!-- Video Comparison -->
+    <div class="video-section">
+      <div class="video-box">
+        <h4>Your Video</h4>
+        <video controls>
+          <source src="{{ user_video_url }}" type="video/mp4">
+        </video>
       </div>
-      <div class="pose-box">
-        <h4>Pro Athlete Pose</h4>
-        <img src="{{ athlete_image_url }}" class="pose-image" alt="Athlete Keypoints Overlay">
+      <div class="video-box">
+        <h4>Pro Athlete Comparison</h4>
+        <video controls>
+          <source src="{{ athlete_video_url }}" type="video/mp4">
+        </video>
       </div>
     </div>
 
+    <!-- Feedback -->
     <h3 class="section-subtitle">Personalized Technique Feedback</h3>
-
     {% if llm_feedback %}
       <ul class="feedback-list">
         {% for line in llm_feedback.splitlines %}
@@ -32,9 +88,23 @@
         {% endfor %}
       </ul>
     {% else %}
-      <p class="error-message">Due to our overwhelming popularity and rapid growth, our servers are too busy at the moment to take your request. Please try again later!</p>
+      <p class="error-message">We're currently overloaded — please try again later!</p>
     {% endif %}
 
+    <!-- Plots -->
+    <!-- {% if angle_plots %}
+      <h3 class="section-subtitle">Angle Comparison Plots</h3>
+      <div class="slider-container">
+        {% for joint, plot_url in angle_plots.items %}
+        <div class="slider-item">
+          <img src="{{ plot_url }}" alt="{{ joint.label }}">
+          <div class="slider-label">{{ joint.label }}</div>          
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %} -->
+
+    <!-- Back Button -->
     <div class="center-button">
       <a href="{% url 'home' %}" class="btn">Back to Home</a>
     </div>
