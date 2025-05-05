@@ -35,6 +35,9 @@ def run_analysis(sport, technique, movement_key, user_path, comp_path, selected_
 
     for joint in selected_joints:
         if not user_angles[joint] or not comp_angles[joint]:
+            print("[DEBUG] User Angles:", list(user_angles.keys()))
+            print("[DEBUG] Comp Angles:", list(comp_angles.keys()))
+            print("[DEBUG] Selected Joints:", selected_joints)
             raise ValueError(f"No angle data for joint {joint}")
 
         dtw_mapping = compute_dtw_mapping(user_angles[joint], comp_angles[joint])

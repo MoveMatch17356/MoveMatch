@@ -87,10 +87,10 @@ def analyze_videos(request):
             athlete_path = default_storage.save(f'tmp/athlete_{uuid.uuid4()}.mp4', athlete_video)
 
         elif reference_option == "library":
-            print(selected_library_video)
             if not selected_library_video or not selected_library_video.strip():
                 return HttpResponseBadRequest("You selected a library video but did not choose one.")
-            athlete_path = selected_library_video.strip()  # already URL
+            relative_path = selected_library_video.replace(settings.MEDIA_URL, "")
+            athlete_path = os.path.join(settings.MEDIA_ROOT, relative_path)
 
         else:
             return HttpResponseBadRequest("Invalid reference video option.")
