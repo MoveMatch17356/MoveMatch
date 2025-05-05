@@ -52,3 +52,21 @@ class Joint(str, Enum):
             Joint.RIGHT_WRIST: [14, 16, 22],
             Joint.LEFT_WRIST: [13, 15, 21],
         }.get(self, None)
+
+    def label(self) -> str:
+        return JOINT_LABELS[self.value]
+
+JOINT_LABELS = {
+    "right_elbow": "Right Elbow",
+    "left_elbow": "Left Elbow",
+    "right_knee": "Right Knee",
+    "left_knee": "Left Knee",
+    "right_shoulder": "Right Shoulder",
+    "left_shoulder": "Left Shoulder",
+    "right_hip": "Right Hip",
+    "left_hip": "Left Hip",
+    "right_ankle": "Right Ankle",
+    "left_ankle": "Left Ankle",
+    "right_wrist": "Right Wrist",
+    "left_wrist": "Left Wrist",
+}
