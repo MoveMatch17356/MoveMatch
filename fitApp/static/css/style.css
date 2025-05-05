@@ -4,7 +4,6 @@
   --overlay-color-2: #0a0a0a;
   --anim-duration: 2s;
 }
-
 #gradient {
   position: fixed;
   top: 0; left: 0;
@@ -14,7 +13,6 @@
   pointer-events: none; 
   opacity: 5;
 }
-
 #gradient:after,
 #gradient:before {
   content: '';
@@ -22,24 +20,19 @@
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
 }
-
 #gradient:before {
   background: linear-gradient(135deg, var(--overlay-color-2) 0%, var(--overlay-color-1) 100%);
   animation: OpacityAnim var(--anim-duration) ease-in-out 0s infinite alternate;
 }
-
 #gradient:after {
   background: linear-gradient(135deg, var(--overlay-color-1) 0%, var(--overlay-color-2) 100%);
   animation: OpacityAnim var(--anim-duration) ease-in-out calc(-1 * var(--anim-duration)) infinite alternate;
 }
-
 @keyframes OpacityAnim {
   0%{opacity: 8.0}
   100%{opacity: 0.0}
 }
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap');
-
-
 body {
   font-family: 'Barlow', sans-serif;
   margin: 0;
@@ -47,36 +40,23 @@ body {
   background-color: #000;
   color: #e0e0e0;
   font-family: 'Montserrat';
-
 }
-
-
 .sport_body{
   background-color: #490000;
-
 }
-
 .technique_body{
   background-color: #231616;
-
   
 }
-
 .container {
     max-width: 800px;
     margin: auto;
     padding: 40px 20px;
     border-radius: 12px;
   }
-
-
   h1.fadeIn{
-
     text-align: center;
-
-
   }
-
   h1.fadeIn span{
     opacity: 0;
     transform: translateY(30px);
@@ -97,9 +77,6 @@ body {
     }
   
   }
-
-
-
   
   /* Titles */
   .title {
@@ -116,7 +93,6 @@ body {
     color: #bbbbbb;
     margin-bottom: 30px;
   }
-
   .btn {
     padding: 12px 24px;
     background-color: #b50000;
@@ -202,13 +178,6 @@ body {
   li strong {
     color: #e0e0e0;
     ;
-  }
-
-
-  
-  .container {
-    max-width: 960px;
-    margin: auto;
   }
   
   .section-title {
