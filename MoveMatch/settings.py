@@ -113,7 +113,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-TIME_ZONE = 'America/New_York'
+    TIME_ZONE = 'America/New_York'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
