@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Technique Comparison Results</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body>
+  <div id = "bar">
+    <a id = "id_nav_logout"href="{% url 'logout' %}"> Logout </a>
+    <a id = "id_nav_logout"href="{% url 'home' %}"> Home </a>
+    <a id = "id_nav_logout"href="{% url 'profile' %}"> Profile </a> 
+  </div>
+  <div class="container">
+    <h2 class="section-title">Technique Comparison Results</h2>
+
+    <div class="pose-comparison">
+      <div class="pose-box">
+        <h4>Your Pose</h4>
+        <img src="{{ user_image_url }}" class="pose-image" alt="User Keypoints Overlay">
+      </div>
+      <div class="pose-box">
+        <h4>Pro Athlete Pose</h4>
+        <img src="{{ athlete_image_url }}" class="pose-image" alt="Athlete Keypoints Overlay">
+      </div>
+    </div>
+
+    <h3 class="section-subtitle">Personalized Technique Feedback</h3>
+
+    {% if llm_feedback %}
+      <ul class="feedback-list">
+        {% for line in llm_feedback.splitlines %}
+          {% if line.strip %}
+            <li>{{ line|safe }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="error-message">Due to our overwhelming popularity and rapid growth, our servers are too busy at the moment to take your request. Please try again later!</p>
+    {% endif %}
+
+    <div class="center-button">
+      <a href="{% url 'home' %}" class="btn">Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

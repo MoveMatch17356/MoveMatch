@@ -1,5 +1,6 @@
 import shutil
 import os
+import uuid
 from datetime import datetime
 from video_analysis.pose_extraction import extract_3d_poses
 from video_analysis.angle_analysis import compute_joint_angles
@@ -8,18 +9,49 @@ from video_analysis.plotting import plot_joint_angles, plot_dtw_mapping
 from video_analysis.middle_frame import save_middle_frame
 from video_analysis.llm import generate_athlete_feedback
 
+import cv2
+
+def copy_video(input_path, output_path):
+    # Open the input video
+    cap = cv2.VideoCapture(input_path)
+    if not cap.isOpened():
+        raise IOError(f"Cannot open video file: {input_path}")
+
+    # Get video properties
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Or use 'XVID', 'MJPG', etc.
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Create the VideoWriter
+    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        out.write(frame)
+
+    cap.release()
+    out.release()
+    print(f"Video saved to {output_path}")
+
 
 def run_analysis(sport, technique, movement_key, user_video_path, comp_video_path, selected_joints):
-    # Clean up results folder
+    # Base directory to save results
     base_results_dir = "media/results"
-    if os.path.exists(base_results_dir):
-        shutil.rmtree(base_results_dir)
     os.makedirs(base_results_dir, exist_ok=True)
 
-    # Create new output folder
+    # Create a unique subdirectory for this run
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(base_results_dir, timestamp)
+    unique_id = uuid.uuid4().hex[:6]  # Optional: short UUID fragment
+    output_dir = os.path.join(base_results_dir, f"{timestamp}_{unique_id}")
     os.makedirs(output_dir, exist_ok=True)
+
+    user_video_path = os.path.join(output_dir, "user_video.mp4")
+    comparison_video_path = os.path.join(output_dir, "comparison_video.mp4")
+    copy_video(user_path, user_video_path)
+    copy_video(comp_path, comparison_video_path)
 
     # Pose extraction
     user_poses = extract_3d_poses(user_video_path)
@@ -80,11 +112,17 @@ def run_analysis(sport, technique, movement_key, user_video_path, comp_video_pat
         comp_video_path=comp_video_path
     )
 
-    return {
+    result = {
         "angle_plots": angle_plots,
         "aligned_plots": aligned_plots,
         "dtw_plots": dtw_plots,
         "user_image": user_image.replace("media/", "", 1),
         "comp_image": comp_image.replace("media/", "", 1),
+        "user_video": user_video_path.replace("media/", "", 1),
+        "comp_video": comparison_video_path.replace("media/", "", 1),
         "llm_feedback": feedback,
     }
+    
+    print(result)
+
+    return result

@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Technique Comparison Results</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+<body>
+    <body>
+        <div id = "bar">
+          <a id = "id_nav_logout"href="{% url 'logout' %}"> Logout </a>
+          <a id = "id_nav_logout"href="{% url 'profile' %}"> Profile </a>
+          <a id = "id_nav_logout"href="{% url 'home' %}"> Home </a>
+      
+        </div>
+
+  <div class="container">
+    <h2 class="section-title">{{ run.sport|title }} – {{ run.technique|title }}</h2>
+
+    <div class="pose-comparison">
+      <div class="pose-box">
+        <h4>Your Pose</h4>
+        <img src="{{ run.video.url }}" class="pose-image" alt="User Keypoints Overlay">
+      </div>
+      <!-- Optionally: display pro athlete pose if stored separately -->
+    </div>
+
+    <h3 class="section-subtitle">Personalized Technique Feedback</h3>
+
+    {% if run.feedback %}
+      <ul class="feedback-list">
+        {% for line in run.feedback.splitlines %}
+          {% if line.strip %}
+            <li>{{ line|safe }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="error-message">
+        Due to our overwhelming popularity and rapid growth, our servers are too busy at the moment to take your request. Please try again later!
+      </p>
+    {% endif %}
+
+    <div class="center-button">
+      <a href="{% url 'profile' %}"  class="btn">Back to My Analyses</a>
+    </div>
+  </div>
+</body>
+</html>

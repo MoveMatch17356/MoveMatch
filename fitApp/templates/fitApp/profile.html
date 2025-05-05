@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>Runs</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+</head>
+
+<body>
+    <body>
+        <div id = "bar">
+          <a id = "id_nav_logout"href="{% url 'logout' %}"> Logout </a>
+          <a id = "id_nav_logout"href="{% url 'home' %}"> Home </a>     
+        </div>
+
+
+  <div id = "gradient"></div>
+
+
+  <h2 style="text-align: center;">Profile: My Analysis Runs</h2>
+
+  <div class="flex-row">
+      <form class="tab" method="POST" action="{% url 'profile' %}">
+          {% csrf_token %}
+          {{ sport_form.sport }}
+          {% if show_technique %}
+              {{ technique_form.technique }}
+          {% endif %}
+          <button class="btn">Submit</button>
+      </form>
+
+      <div class="tab-container">
+          {% for run in runs %}
+              <a class="tab" href="{% url 'past_run' run.id %}">
+                  {{ run.id }}: {{ run.uploaded_at|date:"F j, Y, g:i a" }}
+              </a>
+          {% empty %}
+              <p>No analysis runs yet.</p>
+          {% endfor %}
+      </div>
+  </div>
+</body>
+</html>

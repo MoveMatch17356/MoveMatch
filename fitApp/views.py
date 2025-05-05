@@ -1,6 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.http import HttpResponse, Http404
+
 from django.core.files.storage import default_storage
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from fitApp.forms import LoginForm, RegisterForm, SportForm, SoccerForm, TennisForm, RunningForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from fitApp.models import AnalysisRun
+
+
 from django.http import HttpResponseBadRequest
 
 import re
@@ -11,48 +21,124 @@ import traceback
 from video_analysis.types import Joint
 from video_analysis.run_analysis import run_analysis
 from video_analysis.sports import ALL_SPORTS
-from .models import ReferenceVideo
-import shutil
 
-def clear_tmp_media():
-    tmp_dir = os.path.join(settings.MEDIA_ROOT, 'tmp')
-    if os.path.exists(tmp_dir):
-        for filename in os.listdir(tmp_dir):
-            file_path = os.path.join(tmp_dir, filename)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print(f'Failed to delete {file_path}. Reason: {e}')
 
-import subprocess
+def login_action(request):
 
-def convert_to_mp4(input_path):
-    base_name = os.path.splitext(os.path.basename(input_path))[0]
-    output_relpath = f'tmp/{base_name}_converted.mp4'
-    output_path = os.path.join(settings.MEDIA_ROOT, output_relpath)
+    context = {}
 
-    subprocess.run([
-        'ffmpeg', '-y', '-i', input_path,
-        '-vcodec', 'libx264', '-acodec', 'aac',
-        '-preset', 'fast', output_path
-    ], check=True)
+    # Just display the registration form if this is a GET request.
+    if request.method == 'GET':
+        context['form'] = LoginForm()
+        return render(request, 'fitApp/login.html', context)
 
-    return output_relpath  # return relative path so it can be used with default_storage.url(...)
+    # Creates a bound form from the request POST parameters and makes the 
+    # form available in the request context dictionary.
+    form = LoginForm(request.POST)
+    context['form'] = form
 
+    # Validates the form.
+    if not form.is_valid():
+        return render(request, 'fitApp/login.html', context)
+
+    new_user = authenticate(username=form.cleaned_data['username'],
+                            password=form.cleaned_data['password'])
+
+    login(request, new_user)
+    return redirect(reverse('home'))
+
+
+def register_action(request):
+    context = {}
+
+    # Just display the registration form if this is a GET request.
+    if request.method == 'GET':
+        context['form'] = RegisterForm()
+        return render(request, 'fitApp/register.html', context)
+
+    # Creates a bound form from the request POST parameters and makes the 
+    # form available in the request context dictionary.
+    form = RegisterForm(request.POST)
+    context['form'] = form
+
+    # Validates the form.
+    if not form.is_valid():
+        return render(request, 'fitApp/register.html', context)
+
+    # At this point, the form data is valid.  Register and login the user.
+    new_user = User.objects.create_user(username=form.cleaned_data['username'], 
+                                        password=form.cleaned_data['password'],
+                                        email=form.cleaned_data['email'],
+                                        first_name=form.cleaned_data['first_name'],
+                                        last_name=form.cleaned_data['last_name'])
+    new_user.save()
+
+    new_user = authenticate(username=form.cleaned_data['username'],
+                            password=form.cleaned_data['password'])
+
+    login(request, new_user)
+    return redirect(reverse('home'))
+
+
+def logout_action(request):
+    logout(request)
+    return redirect(reverse('login'))
+
+@login_required
 def home(request):
-    # clear tmp folder
-    clear_tmp_media()
-    # render page
-    return render(request, 'welcome_page.html')
+    return render(request, 'fitApp/welcome_page.html')
 
+
+@login_required
+def profile(request):
+    sport_form = SportForm()
+    technique_form = None
+    show_technique = False
+    user_runs = AnalysisRun.objects.filter(user=request.user).order_by('-id')
+
+    if request.method == 'POST':
+        sport_form = SportForm(request.POST)
+        selected_sport = request.POST.get('sport')
+        selected_technique = request.POST.get('technique')
+
+        if sport_form.is_valid():
+            user_runs = user_runs.filter(sport=selected_sport)
+            show_technique = True
+
+            if selected_sport == 'soccer':
+                technique_form = SoccerForm(request.POST)
+            elif selected_sport == 'tennis':
+                technique_form = TennisForm(request.POST)
+            elif selected_sport == 'running':
+                technique_form = RunningForm(request.POST)
+
+            if technique_form and technique_form.is_valid():
+                user_runs = user_runs.filter(technique=selected_technique)
+
+    return render(request, 'fitApp/profile.html', {
+        'runs': user_runs,
+        'sport_form': sport_form,
+        'technique_form': technique_form,
+        'show_technique': show_technique
+    })
+
+
+
+
+@login_required
+def past_run(request,run_id):
+    run = get_object_or_404(AnalysisRun, id=run_id, user=request.user)
+    return render(request, 'fitApp/analysis_run_detail.html', {'run': run})
+
+
+
+@login_required
 def pick_sport(request):
     if request.method == 'GET':
         context = {'sports': ALL_SPORTS.values()}
-        return render(request, 'pick_sport.html', context)
+        return render(request, 'fitApp/pick_sport.html', context)
 
+@login_required
 def pick_technique(request):
     if request.method == 'POST':
         sport_key = request.POST.get('sport')
@@ -67,7 +153,7 @@ def pick_technique(request):
             'sport': sport,
             'techniques': sport.techniques
         }
-        return render(request, 'pick_technique.html', context)
+        return render(request, 'fitApp/pick_technique.html', context)
 
 # def display_upload_form(request):
 #     request.session['technique'] = request.POST.get("technique")
@@ -78,7 +164,7 @@ def pick_technique(request):
 #         }
 #         return render(request, 'upload_videos.html', context)
 #     return render(request, 'upload_videos.html')
-
+@login_required
 def display_upload_form(request):
     if request.method == 'POST':
         request.session['technique'] = request.POST.get("technique")
@@ -121,15 +207,16 @@ def display_upload_form(request):
             'user_video_url': user_video_url,
             'athlete_video_url': athlete_video_url
         }
-
-        return render(request, 'upload_videos.html', context)
-
-    return render(request, 'upload_videos.html')
+        return render(request, 'fitApp/upload_videos.html', context)
+    return render(request, 'fitApp/upload_videos.html')
 
 
 def convert_markdown(text):
     return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
 
+
+
+@login_required
 def analyze_videos(request):
     if request.method == 'POST':
         user_video = request.FILES.get('user_video')
@@ -137,10 +224,9 @@ def analyze_videos(request):
         selected_library_video = request.POST.get('selected_library_video')
         reference_option = request.POST.get('reference_option')
 
-        # --- 1. Validate user upload ---
-        if not user_video:
-            return render(request, 'upload_videos.html', {
-                'error': 'Please upload your own video.'
+        if not user_video or not athlete_video:
+            return render(request, 'fitApp/upload_videos.html', {
+                'error': 'Please upload both videos for analysis.'
             })
 
         user_path = default_storage.save(f'tmp/user_{uuid.uuid4()}.mp4', user_video)
@@ -209,19 +295,26 @@ def analyze_videos(request):
 
         except Exception as e:
             traceback.print_exc()
-            return render(request, 'upload_videos.html', {
+            return render(request, 'fitApp/upload_videos.html', {
                 'error': f"Something went wrong: {str(e)}"
             })
 
         # --- 5. Render results ---
         joint_labels = {joint: joint.replace("_", " ").title() for joint in results['angle_plots'].keys()}
-        return render(request, 'results.html', {
-            'user_video_url': default_storage.url(user_path),
-            'athlete_video_url': default_storage.url(athlete_path),
-            # 'user_image_url': default_storage.url(results['user_image']),
-            'user_image_url': '/' + results['user_image'],
-            # 'athlete_image_url': default_storage.url(results['comp_image']),
-            'athlete_image_url': '/' + results['comp_image'],
+
+        run = AnalysisRun(
+            video= results['comp_image'],
+            feedback=convert_markdown(results['llm_feedback']),
+            sport=request.session['sport'],
+            technique=request.session['technique'],
+            user=request.user
+        )
+        run.save()
+
+        print("RESULULTS CALCULATED AND RUN SAVED")
+        return render(request, 'fitApp/results.html', {
+            'user_image_url': default_storage.url(results['user_image']),
+            'athlete_image_url': default_storage.url(results['comp_image']),
             'llm_feedback': convert_markdown(results['llm_feedback']),
             # 'angle_plots': {k: default_storage.url(v) for k, v in results['angle_plots'].items()},
             'angle_plots': {k: '/' + v for k, v in results['angle_plots'].items()},
